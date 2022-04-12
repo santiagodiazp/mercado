@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Spring Boot Thymeleaf - Bootstrap WebJars</title>
+
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <form action="#" th:action="@{/}" th:object="${searchForm}" method="post" id="searchForm" name="searchForm">
+            <div class="mb-3">
+                <label for="search" class="form-label">Buscar producto</label>
+                <input type="search" class="form-control" id="search" name="search" th:field="*{search}" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">Ingresa el nombre de un producto para buscar.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Origen</th>
+                        <th scope="col">Buscar en origen</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="product: ${products}">
+                        <td>
+                            <a href="#"  th:text="${product.name}" th:attr="onclick=|submitForm('${product.name}')|">
+
+                            </a>
+                        </td>
+                        <td th:text="${product.price}"></td>
+                        <td><img th:src="${product.image}" class="img-fluid img-thumbnail"></td>
+                        <td th:text="${product.origin}"></td>
+                        <td>
+                            <a  target="_blank" th:href="${product.url + product.name}">
+                                <button type="button" class="btn btn-secondary">
+                                    <i class="bi bi-zoom-in"></i>
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+<script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+
+</body>
+
+<style>
+    img {
+        width: 50px;
+        height: auto;
+    }
+</style>
+
+<script>
+    function submitForm(s) {
+        console.log(s)
+        $('#search').val(s)
+        $('#searchForm').submit();
+    }
+</script>
+
+</html>
