@@ -35,7 +35,7 @@ public class SearchProductsController {
     public static final String SUPERSEIS = "https://www.superseis.com.py/search.aspx?searchterms=";
     public static final String CASARICA = "https://www.casarica.com.py/productos?q=";
     public static final String STOCK = "https://www.stock.com.py/search.aspx?searchterms=";
-    public static final String REAL = "https://www.realonline.com.py/catalogsearch/result/?q=";
+    public static final String REAL = "https://www.realonline.com.py/search?name=";
     public static final String SALEMMA = "https://www.salemmaonline.com.py/buscar?q=";
     public static final String SUPERMAS = "https://www.supermas.com.py/productos?q=";
 
