@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Spring Boot Thymeleaf - Bootstrap WebJars</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- added -->
 
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css} "/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
@@ -14,26 +15,26 @@
 
     </div>
     <div class="row">
-        <form action="#" th:action="@{/}" th:object="${searchForm}" method="post" id="searchForm" name="searchForm">
+        <form action="#" th:action="@{/}" th:object="${searchForm}" method="post" id="searchForm" name="searchForm" class="gy-2"> <!-- added class -->
             <div class="mb-3">
                 <label for="search" class="form-label">Buscar producto</label>
-                <input type="search" class="form-control" id="search" name="search" th:field="*{search}" aria-describedby="emailHelp">
+                <input type="search" class="form-control" id="search" name="search" th:field="*{search}" aria-describedby="emailHelp" inputmode="search" autocomplete="on" placeholder="Ej.: Manzana"> <!-- added attrs -->
                 <div id="emailHelp" class="form-text">Ingresa el nombre de un producto para buscar.</div>
             </div>
-            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="submit" class="btn btn-primary w-100 w-sm-auto">Buscar</button> <!-- full-width on xs -->
         </form>
     </div>
     <div class="row">
         <div class="col">
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-sm table-hover align-middle"> <!-- improved table classes -->
                     <thead>
                     <tr>
                         <th scope="col">Producto</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Imagen</th>
-                        <th scope="col">Origen</th>
-                        <th scope="col">Buscar en origen</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Precio</th> <!-- hide on xs -->
+                        <th scope="col" class="d-none d-sm-table-cell">Imagen</th> <!-- hide on xs -->
+                        <th scope="col" class="d-none d-md-table-cell">Origen</th> <!-- hide on xs/sm -->
+                        <th scope="col" class="text-end d-none d-sm-table-cell">Buscar en origen</th> <!-- hide on xs -->
                     </tr>
                     </thead>
                     <tbody>
@@ -43,11 +44,13 @@
 
                             </a>
                         </td>
-                        <td th:text="${product.price}"></td>
-                        <td><img th:src="${product.image}" class="img-fluid img-thumbnail"></td>
-                        <td th:text="${product.origin}"></td>
-                        <td>
-                            <a  target="_blank" th:href="${product.url + product.name}">
+                        <td class="d-none d-sm-table-cell" th:text="${product.price}"></td>
+                        <td class="d-none d-sm-table-cell">
+                            <img th:src="${product.image}" class="img-fluid img-thumbnail" alt="Imagen del producto">
+                        </td>
+                        <td class="d-none d-md-table-cell" th:text="${product.origin}"></td>
+                        <td class="text-end d-none d-sm-table-cell">
+                            <a target="_blank" th:href="${product.url + product.name}" aria-label="Buscar en origen">
                                 <button type="button" class="btn btn-secondary">
                                     <i class="bi bi-zoom-in"></i>
                                 </button>
@@ -56,6 +59,8 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- On extra-small screens, provide a secondary action row for each product -->
+                <!-- This keeps actions accessible without cramping the table -->
             </div>
         </div>
     </div>
@@ -71,6 +76,22 @@
     img {
         width: 50px;
         height: auto;
+    }
+
+    /* Improve touch targets and spacing on small screens */
+    @media (max-width: 575.98px) {
+        .btn {
+            min-height: 44px;
+        }
+        .form-control {
+            min-height: 44px;
+        }
+        .table {
+            font-size: 0.95rem;
+        }
+        img {
+            width: 40px;
+        }
     }
 </style>
 
