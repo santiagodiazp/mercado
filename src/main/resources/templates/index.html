@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Spring Boot Thymeleaf - Bootstrap WebJars</title>
+    <title>Comparador de Precios - Supermercados PY</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- added -->
 
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css} "/>
@@ -10,64 +10,150 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="row">
+<!-- App Header -->
+<header class="bg-primary text-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark container">
+        <a class="navbar-brand d-flex align-items-center" href="#" th:href="@{/}">
+            <i class="bi bi-cart-check me-2"></i>
+            <span>Comparador de Precios</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+                aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="topNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" th:href="@{/}">
+                        <i class="bi bi-house me-1"></i>Inicio
+                    </a>
+                </li>
+            </ul>
+            <!-- Desktop/tablet header search (hidden on small) -->
+            <form th:action="@{/}" th:object="${searchForm}" method="post"
+                  class="d-none d-lg-flex gap-2 my-2 my-lg-0" role="search" id="searchFormDesktop">
+                <input class="form-control" type="search" th:field="*{search}" name="search"
+                       placeholder="Buscar productos…" aria-label="Buscar" style="min-width: 240px;">
+                <button class="btn btn-light" type="submit">
+                    <i class="bi bi-search"></i>
+                    <span class="d-none d-sm-inline">Buscar</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
 
-    </div>
-    <div class="row">
-        <form action="#" th:action="@{/}" th:object="${searchForm}" method="post" id="searchForm" name="searchForm" class="gy-2"> <!-- added class -->
-            <div class="mb-3">
-                <label for="search" class="form-label">Buscar producto</label>
-                <input type="search" class="form-control" id="search" name="search" th:field="*{search}" aria-describedby="emailHelp" inputmode="search" autocomplete="on" placeholder="Ej.: Manzana"> <!-- added attrs -->
-                <div id="emailHelp" class="form-text">Ingresa el nombre de un producto para buscar.</div>
+<!-- Mobile-only search (always visible on small screens) -->
+<section class="bg-white border-bottom d-lg-none">
+    <div class="container py-2">
+        <form th:action="@{/}" th:object="${searchForm}" method="post" id="searchForm" class="row g-2 align-items-center">
+            <div class="col-9">
+                <input class="form-control" type="search" th:field="*{search}" name="search" id="search"
+                       placeholder="Buscar productos…" aria-label="Buscar" style="min-height: 44px;">
             </div>
-            <button type="submit" class="btn btn-primary w-100 w-sm-auto">Buscar</button> <!-- full-width on xs -->
+            <div class="col-3 d-grid">
+                <button class="btn btn-primary" type="submit" style="min-height: 44px;">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
         </form>
     </div>
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle"> <!-- improved table classes -->
-                    <thead>
-                    <tr>
-                        <th scope="col">Producto</th>
-                        <th scope="col" class="d-none d-sm-table-cell">Precio</th> <!-- hide on xs -->
-                        <th scope="col" class="d-none d-sm-table-cell">Imagen</th> <!-- hide on xs -->
-                        <th scope="col" class="d-none d-md-table-cell">Origen</th> <!-- hide on xs/sm -->
-                        <th scope="col" class="text-end d-none d-sm-table-cell">Buscar en origen</th> <!-- hide on xs -->
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="product: ${products}">
-                        <td>
-                            <a href="#"  th:text="${product.name}" th:attr="onclick=|submitForm('${product.name}')|">
+</section>
 
-                            </a>
-                        </td>
-                        <td class="d-none d-sm-table-cell" th:text="${product.price}"></td>
-                        <td class="d-none d-sm-table-cell">
-                            <img th:src="${product.image}" class="img-fluid img-thumbnail" alt="Imagen del producto">
-                        </td>
-                        <td class="d-none d-md-table-cell" th:text="${product.origin}"></td>
-                        <td class="text-end d-none d-sm-table-cell">
-                            <a target="_blank" th:href="${product.url + product.name}" aria-label="Buscar en origen">
-                                <button type="button" class="btn btn-secondary">
-                                    <i class="bi bi-zoom-in"></i>
-                                </button>
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <!-- On extra-small screens, provide a secondary action row for each product -->
-                <!-- This keeps actions accessible without cramping the table -->
-            </div>
-        </div>
+<!-- Title / Hero -->
+<section class="bg-light border-bottom">
+    <div class="container py-4">
+        <h1 class="h3 mb-1 d-flex align-items-center">
+            <i class="bi bi-tags me-2 text-primary"></i>
+            Encuentra el mejor precio al instante
+        </h1>
+        <p class="text-muted mb-0">Compara productos y precios entre supermercados de Paraguay.</p>
     </div>
-</div>
+</section>
 
+<div class="container mt-4">
+    <!-- Result header -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h5 mb-0">
+            <i class="bi bi-list-check text-primary me-2"></i> Resultados
+        </h2>
+        <span class="badge bg-secondary" th:text="${#lists.size(products)} + ' ítems'">0 ítems</span>
+    </div>
 
-<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+    <!-- Error/info messages -->
+    <div th:if="${errorMessage}" class="alert alert-warning" role="alert" th:text="${errorMessage}">Mensaje</div>
+    <div th:if="${#lists.isEmpty(products)}" class="alert alert-info" role="alert">
+        No hay resultados para tu búsqueda. Intenta con otro término.
+    </div>
+
+    <!-- Results table -->
+    <div class="table-responsive" th:if="${!#lists.isEmpty(products)}">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col" class="d-none d-sm-table-cell">Precio</th>
+                <th scope="col" class="d-none d-sm-table-cell">Imagen</th>
+                <th scope="col" class="d-none d-md-table-cell">Origen</th>
+                <th scope="col" class="text-end d-none d-sm-table-cell">Buscar en origen</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product: ${products}">
+                <td>
+                    <a href="#" th:text="${product.name}" th:attr="onclick=|submitForm('${product.name}')|"></a>
+                    <!-- Mobile: price under name -->
+                    <div class="d-sm-none mt-1 text-muted small">
+                        <i class="bi bi-tag"></i>
+                        <span th:text="${product.label + ' ' + product.price}"></span>
+                    </div>
+                    <!-- Mobile: image -->
+                    <div class="d-sm-none mt-2">
+                        <img
+                            th:src="${product.image}"
+                            class="img-fluid img-thumbnail"
+                            alt=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            onerror="this.onerror=null; this.src='https://via.placeholder.com/72x72?text=IMG';"
+                            style="max-width: 72px; height: auto;"
+                        >
+                        <div class="small text-muted mt-1 text-truncate" style="max-width: 220px;"
+                             th:text="${product.image}"></div>
+                    </div>
+                    <!-- Mobile: origin + open -->
+                    <div class="d-sm-none mt-2 d-flex align-items-center justify-content-between">
+                        <small class="text-muted" th:text="${product.origin}"></small>
+                        <a target="_blank" rel="noopener noreferrer" th:href="${product.url + product.name}" aria-label="Abrir en supermercado">
+                            <button type="button" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-box-arrow-up-right"></i> Abrir
+                            </button>
+                        </a>
+                    </div>
+                </td>
+                <td class="d-none d-sm-table-cell" th:text="${product.price}"></td>
+                <td class="d-none d-sm-table-cell">
+                    <img
+                        th:src="${product.image}"
+                        class="img-fluid img-thumbnail"
+                        alt=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100?text=IMG';"
+                        style="max-width: 120px; height: auto;"
+                    >
+                    <div class="small text-muted mt-1 text-truncate" style="max-width: 220px;"
+                         th:text="${product.image}"></div>
+                </td>
+                <td class="d-none d-md-table-cell" th:text="${product.origin}"></td>
+                <td class="text-end d-none d-sm-table-cell">
+                    <a target="_blank" th:href="${product.url + product.name}" aria-label="Buscar en origen">
+                        <button type="button" class="btn btn-secondary">
+                            <i class="bi bi-zoom-in"></i>
+                        </button>
+                    </a>
+                </td>
+            </tr>
 <script src="webjars/jquery/3.6.0/jquery.min.js"></script>
 
 </body>

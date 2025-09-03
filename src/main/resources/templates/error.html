@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Algo salió mal</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h4 mb-3"><i class="bi bi-emoji-frown me-2"></i>Lo sentimos, ocurrió un problema</h1>
+                    <p class="text-muted mb-4">Intenta nuevamente en unos segundos. Si el problema persiste, verifica tu conexión.</p>
+                    <div class="mb-3 small text-muted">
+                        <div th:if="${status}">Código: <span th:text="${status}">500</span></div>
+                        <div th:if="${error}">Error: <span th:text="${error}">Error</span></div>
+                        <div th:if="${message}">Detalle: <span th:text="${message}">Detalle</span></div>
+                        <div th:if="${path}">Ruta: <span th:text="${path}">/</span></div>
+                        <div th:if="${timestamp}">Hora: <span th:text="${timestamp}">-</span></div>
+                    </div>
+                    <a th:href="@{/}" class="btn btn-primary w-100 w-sm-auto">
+                        <i class="bi bi-arrow-left"></i> Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+</body>
+</html>

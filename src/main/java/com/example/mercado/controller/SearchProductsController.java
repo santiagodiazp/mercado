@@ -5,6 +5,7 @@ import com.example.mercado.dto.SearchDto;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -40,17 +42,23 @@ public class SearchProductsController {
     public static final String SUPERMAS = "https://www.supermas.com.py/productos?q=";
 
     @GetMapping("/")
-    public String search(Model model){
+    public String search(Model model) {
         model.addAttribute("products", new ArrayList<>());
         model.addAttribute("searchForm", new SearchDto());
         return "index";
     }
 
 
-
     @PostMapping("/")
     public String listStudent(@ModelAttribute("searchForm") SearchDto request, Model model) {
         try {
+            if (request == null || request.getSearch() == null || request.getSearch().trim().isEmpty()) {
+                model.addAttribute("products", new ArrayList<>());
+                model.addAttribute("searchForm", request == null ? new SearchDto() : request);
+                model.addAttribute("errorMessage", "Ingresa un término de búsqueda.");
+                return "index";
+            }
+
             String withoutEncode = request.getSearch();
             String search = encodeValue(withoutEncode);
 
@@ -71,22 +79,23 @@ public class SearchProductsController {
             objectList.sort(Comparator.comparing(ProductsDto::getName));
             objectList.sort(Comparator.comparing(ProductsDto::getPrice));
 
-
-            Pattern p = Pattern.compile(".*" + withoutEncode + ".*",Pattern.CASE_INSENSITIVE);
+            Pattern p = Pattern.compile(".*" + withoutEncode + ".*", Pattern.CASE_INSENSITIVE);
 
             List<ProductsDto> productsDtoList = objectList
                     .stream()
                     .filter(c -> p.matcher(c.getName()).matches())
                     .collect(Collectors.toList());
 
-
             model.addAttribute("products", productsDtoList);
             model.addAttribute("searchForm", request);
             return "index";
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Search failed", e);
+            model.addAttribute("products", new ArrayList<>());
+            model.addAttribute("searchForm", request == null ? new SearchDto() : request);
+            model.addAttribute("errorMessage", "No pudimos completar la búsqueda. Intenta de nuevo más tarde.");
+            return "index";
         }
-
     }
 
     private String encodeValue(String value) {
@@ -105,58 +114,89 @@ public class SearchProductsController {
         Elements prices = new Elements();
         Elements products = new Elements();
         Elements images = new Elements();
-        if(SUPERSEIS.equals(client)){
+        if (SUPERSEIS.equals(client)) {
             products.addAll(document.select("h2.product-title"));
             prices.addAll(document.select("span.price-label"));
             images.addAll(document.select("a.picture-link > img"));
         }
-        if(CASARICA.equals(client)){
+        if (CASARICA.equals(client)) {
             products.addAll(document.select("h2.ecommercepro-loop-product__title"));
             prices.addAll(document.select("span.price > span.amount"));
             images.addAll(document.select("div.product-list-image > img"));
         }
-        if(STOCK.equals(client)){
+        if (STOCK.equals(client)) {
             products.addAll(document.select("h2.product-title"));
             prices.addAll(document.select("span.price-label"));
             images.addAll(document.select("a.picture-link > img"));
         }
-        if(REAL.equals(client)){
-            products.addAll(document.select("a.product-item-link"));
-            prices.addAll(document.select("span[data-price-type=finalPrice]"));
-            images.addAll(document.select("img.product-image-photo"));
+        if (REAL.equals(client)) {
+            Pattern triplet = Pattern.compile(
+                    "(?s)\\{\\s*\"product\"\\s*:\\s*\\{\\s*\"name\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"price\"\\s*:\\s*(\\d+)\\s*,\\s*\"photosUrl\"\\s*:\\s*\\[\\s*\"([^\"]+)\""
+            );
+
+            for (Element script : document.select("script")) {
+                String raw = script.data();
+                if (raw.isEmpty()) raw = script.html();
+                if (raw.isEmpty()) continue;
+
+                // Normalize common escapes from JS/Next.js
+                String normalized = raw
+                        .replace("\\u0022", "\"")
+                        .replace("\\x22", "\"")
+                        .replace("\\/", "/")
+                        .replace("\\\"", "\"");
+
+                Matcher m = triplet.matcher(normalized);
+                while (m.find()) {
+                    String name  = m.group(1);
+                    long price   = Long.parseLong(m.group(2));
+                    String photo = m.group(3);
+                    ProductsDto p = ProductsDto
+                            .builder()
+                            .name(name)
+                            .price(price)
+                            .label("GS")
+                            .image(photo)
+                            .origin(new URL(client).getHost())
+                            .url(client)
+                            .build();
+                    productsDtos.add(p);
+                }
+            }
+
         }
-        if(SALEMMA.equals(client)){
+        if (SALEMMA.equals(client)) {
             products.addAll(document.select("a.apsubtitle"));
             prices.addAll(document.select("h6[class=pprice]"));
             images.addAll(document.select("img.imgprodts"));
         }
-        if(SUPERMAS.equals(client)){
+        if (SUPERMAS.equals(client)) {
             products.addAll(document.select("h2.woocommerce-loop-product__title"));
             prices.addAll(document.select("span.price > span.amount"));
             images.addAll(document.select("div.product-list-image > img"));
         }
         logger.info(client);
-        logger.info("products: "+products.size());
-        logger.info("prices: "+prices.size());
-        logger.info("images: "+images.size());
+        logger.info("products: " + products.size());
+        logger.info("prices: " + prices.size());
+        logger.info("images: " + images.size());
         for (int i = 0; i < products.size(); i++) {
-           String text = "NN";
-           String text1 = "NN";
-           String text2= "NN";
-           try {
-               text = products.get(i).text();
-               text1 = prices.get(i).text()
-                       .replace(".","")
-                       .replace("₲","")
-                       .replace("Gs","")
-                       .replace("el KG","")
-                       .trim();
-               text2 = images.get(i).attr("data-src") +  images.get(i).attr("src");
-           }catch (Exception e){
-               logger.error(client);
-               logger.error(e.getMessage());
-           }
-           ProductsDto p = ProductsDto
+            String text = "NN";
+            String text1 = "NN";
+            String text2 = "NN";
+            try {
+                text = products.get(i).text();
+                text1 = prices.get(i).text()
+                        .replace(".", "")
+                        .replace("₲", "")
+                        .replace("Gs", "")
+                        .replace("el KG", "")
+                        .trim();
+                text2 = images.get(i).attr("data-src") + images.get(i).attr("src");
+            } catch (Exception e) {
+                logger.error(client);
+                logger.error(e.getMessage());
+            }
+            ProductsDto p = ProductsDto
                     .builder()
                     .name(text)
                     .price(Strings.isEmpty(text1) ? 0L : Long.parseLong(text1))
