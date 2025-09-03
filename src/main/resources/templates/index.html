@@ -163,6 +163,30 @@
         width: 50px;
         height: auto;
     }
+    /* Fullscreen loading overlay */
+    #loadingOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.85);
+        z-index: 2000;
+        display: none; /* hidden by default */
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(2px);
+    }
+    /* Spinner */
+    .loader {
+        width: 64px;
+        height: 64px;
+        border: 6px solid #e9ecef;
+        border-top-color: #0d6efd;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+        box-shadow: 0 0 12px rgba(13,110,253,.35);
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
 
     /* Improve touch targets and spacing on small screens */
     @media (max-width: 575.98px) {
@@ -181,12 +205,52 @@
     }
 </style>
 
+<!-- Loading overlay -->
+<div id="loadingOverlay" aria-hidden="true" role="status">
+    <div class="text-center">
+        <div class="loader mx-auto mb-3"></div>
+        <div class="fw-semibold text-primary">Buscando mejores precios…</div>
+        <div class="text-muted small">Por favor espera un momento</div>
+    </div>
+</div>
+
 <script>
-    function submitForm(s) {
-        console.log(s)
-        $('#search').val(s)
-        $('#searchForm').submit();
+    // Show overlay
+    function showLoading() {
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'flex';
     }
+    // Hide overlay (optional, in case you reuse elsewhere)
+    function hideLoading() {
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    // Submit by clicking on a product name (existing behavior) + show loading
+    function submitForm(s) {
+        console.log(s);
+        $('#search').val(s);
+        showLoading();
+        $('#searchForm').trigger('submit');
+    }
+
+    // Attach submit listeners to all search forms and disable their buttons while loading
+    document.addEventListener('DOMContentLoaded', function () {
+        var forms = [];
+        var f1 = document.getElementById('searchForm');
+        var f2 = document.getElementById('searchFormDesktop');
+        if (f1) forms.push(f1);
+        if (f2) forms.push(f2);
+
+        forms.forEach(function (form) {
+            form.addEventListener('submit', function () {
+                // Disable all buttons in this form to prevent double submits
+                Array.prototype.slice.call(form.querySelectorAll('button[type="submit"]'))
+                    .forEach(function (btn) { btn.disabled = true; });
+                showLoading();
+            });
+        });
+    });
 </script>
 
 </html>
