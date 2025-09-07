@@ -28,7 +28,7 @@ public class SalemmaScraper extends BaseJsoupScraper {
             String name = names.get(i).text();
             long price = parsePrice(prices.get(i).text());
             String image = resolveImage(images.get(i));
-            out.add(product(name, price, "GS", image, BASE, PATH + encodedQuery));
+            out.add(product(name, price, "GS", image, BASE, PATH + name));
         }
         return out;
     }

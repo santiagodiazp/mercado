@@ -122,7 +122,7 @@
                     <!-- Mobile: origin + open -->
                     <div class="d-sm-none mt-2 d-flex align-items-center justify-content-between">
                         <small class="text-muted" th:text="${product.origin}"></small>
-                        <a target="_blank" rel="noopener noreferrer" th:href="${product.url + product.name}" aria-label="Abrir en supermercado">
+                        <a target="_blank" rel="noopener noreferrer" th:href="${product.url}" aria-label="Abrir en supermercado">
                             <button type="button" class="btn btn-outline-secondary btn-sm">
                                 <i class="bi bi-box-arrow-up-right"></i> Abrir
                             </button>
@@ -143,7 +143,7 @@
                 </td>
                 <td class="d-none d-md-table-cell" th:text="${product.origin}"></td>
                 <td class="text-end d-none d-sm-table-cell">
-                    <a target="_blank" th:href="${product.url + product.name}" aria-label="Buscar en origen">
+                    <a target="_blank" th:href="${product.url}" aria-label="Buscar en origen">
                         <button type="button" class="btn btn-secondary">
                             <i class="bi bi-zoom-in"></i>
                         </button>
