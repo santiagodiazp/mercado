@@ -19,7 +19,7 @@ public class CasaRicaScraper extends BaseJsoupScraper {
         Document doc = fetch(url);
 
         Elements names = doc.select("h2.ecommercepro-loop-product__title");
-        Elements prices = doc.select("span.price > span.amount");
+        Elements prices = doc.select("span.amount");
         Elements images = doc.select("div.product-list-image > img");
 
         int count = Math.min(names.size(), Math.min(prices.size(), images.size()));
